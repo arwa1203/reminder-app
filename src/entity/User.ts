@@ -5,7 +5,7 @@ import {
     OneToMany,
     BaseEntity,
 } from "typeorm";
-import { Reminder } from "../entity/Reminders";
+import { Reminder } from "./Reminder";
 @Entity()
 export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -17,9 +17,17 @@ export class User extends BaseEntity {
     @Column()
     lastName: string;
 
+    @Column({
+        unique: true,
+    })
+    email: string;
+
+    @Column({ select: false })
+    password: string;
+
     @Column()
     subscription: boolean;
 
-    @OneToMany(() => Reminder, (reminder) => reminder.userId)
-    reminder: Reminder[];
+    @OneToMany(() => Reminder, (reminder) => reminder.user, { eager: true })
+    reminders: Reminder[];
 }

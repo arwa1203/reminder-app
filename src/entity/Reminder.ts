@@ -24,11 +24,14 @@ export class Reminder extends BaseEntity {
     createdDate: Date;
 
     @Column()
-    frequency: number;
+    deadline: Date;
 
     @Column()
-    userId: number;
-    @ManyToOne(() => User, (user) => user.reminder)
+    alertQuantity: number;
+
+    @ManyToOne(() => User, (user) => user.reminders, {
+        onDelete: "CASCADE",
+    })
     @JoinColumn({ name: "userId" })
     user: User;
 }

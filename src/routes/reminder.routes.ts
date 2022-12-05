@@ -1,17 +1,37 @@
-import { Router } from "express";
-import { Reminder } from "../entity/Reminders";
+import { Request, Response, Router } from "express";
+import { Reminder } from "../entity/Reminder";
+import * as reminderController from "../controllers/reminder.controller";
+import * as userController from "../controllers/user.controller";
+
+import { isAuth } from "../middleware/isAuth";
+import { asyncWrap } from "../middleware/asyncWrap";
+import { sendNewReminderEmail } from "../utils/mail.service";
 
 const router = Router();
-router.post("/create-reminder/:id", async (req, res) => {
-    const reminder = await Reminder.save(req.body);
-    res.status(201).send(reminder);
-});
+router.post(
+    "",
+    isAuth,
+    asyncWrap(async (req: Request, res: Response) => {
+        const { userId, ...partialReminder } = req.body;
+        const reminder = await Reminder.save({
+            ...partialReminder,
+            user: { id: userId },
+        });
 
-router.get("/get-all-reminders/:id", async (req, res) => {
-    const reminder = await Reminder.findOneBy({
-        user: { id: +req.params.id },
-    });
-    res.status(201).send(reminder);
+        const user = await userController.findById(reminder.user.id);
+        if (user.subscription) {
+            console.log(user.subscription);
+
+            await sendNewReminderEmail(user.email, user.firstName, reminder);
+        }
+        res.status(201).send(reminder);
+    })
+);
+
+router.delete("/:id", isAuth, async (req, res) => {
+    const reminder = await reminderController.findById(+req.params.id);
+    await Reminder.remove(reminder);
+    res.status(204).send();
 });
 
 export default router;

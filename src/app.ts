@@ -2,6 +2,7 @@ import express from "express";
 import userRouter from "./routes/user.routes";
 import reminderRouter from "./routes/reminder.routes";
 import { AppDataSource } from "./data-source";
+import { createBatchJob } from "./utils/batch.service";
 const main = async () => {
     const app = express();
     app.use(express.json());
@@ -15,6 +16,8 @@ const main = async () => {
     app.listen(port, () => {
         console.log(`App listening to on port ${port}`);
     });
+
+    createBatchJob();
 };
 
 main();

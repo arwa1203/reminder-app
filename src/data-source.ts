@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { Reminder } from "./entity/Reminders";
+import { Reminder } from "./entity/Reminder";
 import { User } from "./entity/User";
 
 export const AppDataSource = new DataSource({
